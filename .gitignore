@@ -1,0 +1,4 @@
+dist
+src/env.ts
+.vscode/
+node_modules

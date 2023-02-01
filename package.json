@@ -1,0 +1,25 @@
+{
+  "name": "firebolt",
+  "version": "1.0.0",
+  "description": "Firebolt is a back-end tool for uploading content to Amazon S3. It provides a streamlined and efficient way to transfer files to S3",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/main.js\"",
+    "live": "node ./dist/main.js"
+  },
+  "keywords": [],
+  "author": "aaronburt",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.1306.0",
+    "express": "^4.18.2",
+    "mongodb": "^5.0.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.16",
+    "@types/multer": "^1.4.7",
+    "concurrently": "^7.6.0"
+  }
+}
