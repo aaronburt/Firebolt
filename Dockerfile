@@ -6,8 +6,7 @@ COPY . .
 RUN npm install
 
 # Build the deployment apline container
-# This is for ARM cpus
-FROM arm64v8/alpine 
+FROM alpine
 # Install requirements for the application to run
 RUN apk add --update nodejs
 #RUN apk add nano
