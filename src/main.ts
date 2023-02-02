@@ -13,4 +13,4 @@ app.use('/upload', uploadMiddleware);
 
 app.all('*', (req: Request, res: Response) => { return res.sendStatus(HttpStatus.NOT_FOUND); });
 
-app.listen(env.server.port);
+app.listen(env.server.port, () => { console.log(env.server.port) });

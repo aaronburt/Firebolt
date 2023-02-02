@@ -32,4 +32,14 @@ export default class DB {
             return false;
         }
     }
+
+    async setOne(database: string, collection: string, query: Record<any, any>){
+        try {
+            if(!this.connectionEstablished) await this.connectToDb();
+            if(this.client === undefined) throw new Error(DBUtilError.ClientNotDefined);
+            return await this.client.db(database).collection(collection).insertOne(query);
+        } catch(err: any){
+            return false;
+        }
+    }
 }

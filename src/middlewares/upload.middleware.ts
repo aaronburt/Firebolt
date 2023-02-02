@@ -7,9 +7,14 @@ import env from '../env.js';
 import { Request, RequestHandler, Response, Router } from 'express';
 import multer from 'multer';
 import RandomUtil from '../utils/rand.util.js';
+import DB from '../utils/db.util.js';
+import { DBRecord } from '../interface/DBRecord.interface.js';
 
 const upload: RequestHandler = multer({ storage: multer.memoryStorage() }).single('file');
 const router: Router = Router();
+
+const s3 = new S3Util(env.s3.endpoint, env.s3.bucket, env.s3.access_key_id, env.s3.access_key_secret, signatureVersion.v4);
+const db = new DB(env.database.username, env.database.password, env.database.cluster);
 
 router.post('/', async(req: Request, res: Response) => {
     try {
@@ -17,18 +22,21 @@ router.post('/', async(req: Request, res: Response) => {
             if(err) return res.sendStatus(HttpStatus.BAD_REQUEST);
             if(!req.file) return res.sendStatus(HttpStatus.BAD_REQUEST);
 
-            const s3 = new S3Util(env.s3.endpoint, env.s3.bucket, env.s3.access_key_id, env.s3.access_key_secret, signatureVersion.v4);
             const upload = await s3.uploadFileBuffer(new RandomUtil(8).generate(), req.file);
-
             if(!upload) return res.sendStatus(HttpStatus.BAD_REQUEST);
 
-            return res.status(HttpStatus.OK).json({ 
-                status: HttpStatus.OK,
-                etag: upload.ETag,
+            const databaseRecord: DBRecord = {
                 key: upload.Key,
+                bucket: upload.Bucket,
+                etag: upload.ETag,
+                date: Date.now(),
                 cname: env.s3.cname,
-                response: `${env.s3.cname}/${upload.Key}`
-            });
+                size: req.file.size,
+                user: req.headers['x-auth-username'] || ''
+            };
+
+            await db.setOne('firewire', 'content', databaseRecord);
+            return res.status(HttpStatus.OK).json({ status: HttpStatus.OK, response: `${env.s3.cname}/${upload.Key}`, db: databaseRecord });
         });
     } catch(err: any){
         return res.sendStatus(HttpStatus.BAD_REQUEST);
